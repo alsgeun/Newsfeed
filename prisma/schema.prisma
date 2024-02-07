@@ -31,13 +31,13 @@ model Profile {
   userProfileId Int      @id @default(autoincrement()) @map("userProfileId")
   userId        Int      @unique @map("userId")
   name          String   @map("name")
-  weight        Int      @map("weight")
-  height        Int      @map("height")
+  weight        Int?     @map("weight")
+  height        Int?     @map("height")
   birth         Int      @map("birth")
-  address       String   @map("address")
+  address       String?  @map("address")
   nickname      String   @map("nickname")
-  introduction  String   @map("introduction")
-  profileImage  String   @map("profileImage")
+  introduction  String?  @map("introduction")
+  profileImage  String?  @map("profileImage")
   createdAt     DateTime @default(now()) @map("createdAt")
   updatedAt     DateTime @updatedAt @map("updatedAt")
 
@@ -57,7 +57,7 @@ model Posts {
   createdAt    DateTime @default(now()) @map("createdAt")
   updatedAt    DateTime @updatedAt @map("updateAt")
 
-  user     Users      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  user     Users       @relation(fields: [userId], references: [userId], onDelete: Cascade)
   comment  Comments[]
   favorite Favorites[]
 
@@ -93,6 +93,7 @@ model Favorites {
 
   user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
   post Posts @relation(fields: [postId], references: [postId], onDelete: Cascade)
+
   @@map("Favorites")
 }
 
