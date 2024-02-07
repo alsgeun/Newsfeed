@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  userId    Int      @id @default(autoincrement()) @map("userId")
+  email     String   @unique @map("email")
+  password  String   @map("password")
+  createdAt DateTime @default(now()) @map("createdAt")
+  updatedAt DateTime @updatedAt @map("updatedAt")
+  client_id String?  @map("client_id")
+
+  profile  Profile?
+  post     Posts[]
+  comment  Comments[]
+  friend   Friends[]
+  favorite Favorites[]
+
+  @@map("Users")
+}
+
+model Profile {
+  userProfileId Int      @id @default(autoincrement()) @map("userProfileId")
+  userId        Int      @unique @map("userId")
+  name          String   @map("name")
+  weight        Int      @map("weight")
+  height        Int      @map("height")
+  birth         Int      @map("birth")
+  address       String   @map("address")
+  nickname      String   @map("nickname")
+  introduction  String   @map("introduction")
+  profileImage  String   @map("profileImage")
+  createdAt     DateTime @default(now()) @map("createdAt")
+  updatedAt     DateTime @updatedAt @map("updatedAt")
+
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("Profile")
+}
+
+model Posts {
+  postId       Int      @id @default(autoincrement())
+  userId       Int      @map("userId")
+  title        String   @map("title")
+  content      String   @map("content")
+  contentImage String   @map("contentImage") @db.Text
+  url          String?  @map("url")
+  status       Status   @map("status")
+  createdAt    DateTime @default(now()) @map("createdAt")
+  updatedAt    DateTime @updatedAt @map("updateAt")
+
+  user     Users      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  comment  Comments[]
+  favorite Favorites[]
+
+  @@map("Posts")
+}
+
+model Comments {
+  commentId   Int      @id @default(autoincrement()) @map("commentId")
+  userId      Int      @map("userId")
+  postId      Int      @map("postId")
+  content_cmm String   @map("content_cmm") @db.Text
+  createdAt   DateTime @default(now()) @map("createdAt")
+  updatedAt   DateTime @updatedAt @map("updatedAt")
+
+  post Posts @relation(fields: [postId], references: [postId], onDelete: Cascade)
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("Comments")
+}
+
+model Friends {
+  userId   Int @map("userId")
+  friendId Int @unique @default(autoincrement()) @map("postId")
+
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("Friends")
+}
+
+model Favorites {
+  userId Int @unique @map("userId")
+  postId Int @map("postId")
+
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  post Posts @relation(fields: [postId], references: [postId], onDelete: Cascade)
+  @@map("Favorites")
+}
+
+enum Status {
+  healthfood
+  healthmathod
+}
