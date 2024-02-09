@@ -1,10 +1,16 @@
-import express from "express"
+import express, { Router } from "express"
 import jwt from "jsonwebtoken";
 import { prisma } from "../prisma/index.js";
 import bcrypt from "bcrypt";
 const router = express.Router();
 
-router.post('/log-in', async (req, res) => {
+router.get('/', async (req, res) => {
+  res.redirect("http://127.0.0.1:5500/login/kakao_login.html")
+});
+
+router.post('/', async (req, res) => {
+  console.log("!");
+  console.log(req.body);
   const { email, password } = req.body;
   const user = await prisma.users.findFirst({ where: { email } });
   if (!user)
@@ -22,6 +28,8 @@ router.post('/log-in', async (req, res) => {
   res.cookie("authorization", `Bearer ${token}`);
   return res.status(200).json({ message: "로그인 성공" });
 });
+
+
 
 
 
