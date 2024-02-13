@@ -1,3 +1,11 @@
+<div id="profile">
+    <a href="/profile">
+      <img id="profile-image" alt="프로필 사진">
+    </a>
+    <span id="profile-nickname"></span>
+  </div>
+
+
 <h1>게시물 등록</h1>
 <form action="/post" method="POST" enctype="multipart/form-data">
   <div>
@@ -21,12 +29,25 @@
 <script>
   // 페이지 로딩 시 게시물 목록을 가져옵니다.
   window.onload = function() {
-    fetch('/post')
+    // 프로필 정보를 가져옵니다.
+    fetch('/profile')
+      .then(response => response.json())
+      .then(data => {
+        const profileData = data.data;
+        document.getElementById('profile-nickname').innerText = profileData.profile.nickname;
+        document.getElementById('profile-image').src = profileData.profile.profileImage;
+      });
+      // 게시물 가져옴
+      fetch('/post')
       .then(response => response.json())
       .then(data => {
         const postList = document.getElementById('post-list');
         data.data.forEach(post => {
           const postElement = document.createElement('div');
+          postElement.style.border = '1px solid #ccc'; /* 테두리 추가 */
+          postElement.style.borderRadius = '10px'; /* 둥근 모서리 추가 */
+          postElement.style.margin = '10px'; /* 간격 추가 */
+          postElement.style.padding = '10px'; /* 내부 여백 추가 */
           postElement.innerHTML = `
             <h2>${post.title}</h2>
             <p>${post.content}</p>

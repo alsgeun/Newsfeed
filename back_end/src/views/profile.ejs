@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= user.profile.nickname %>'s Profile</title>
+  <link rel="stylesheet" type="text/css" href="../styles.css">
+</head>
+<body>
+  <div class="form-wrapper">
+    <h2><%= user.profile.nickname %>'s Profile</h2>
+    <p>Email: <%= user.email %></p>
+    <p>Name: <%= user.profile.name %></p>
+    <p>Weight: <%= user.profile.weight %></p>
+    <p>Height: <%= user.profile.height %></p>
+    <p>Birth: <%= user.profile.birth %></p>
+    <p>Address: <%= user.profile.address %></p>
+    <p>Nickname: <%= user.profile.nickname %></p>
+    <p>Introduction: <%= user.profile.introduction %></p>
+    <% if (user.profile.profileImage) { %>
+      <img src="<%= user.profile.profileImage %>" alt="Profile Image">
+    <% } %>
+    <a href="/help">도움이 필요하신가요?</a>
+  </div>
+</body>
+</html>

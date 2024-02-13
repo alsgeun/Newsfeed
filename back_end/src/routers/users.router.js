@@ -122,7 +122,7 @@ router.put('/user-sign-up/verify', async(req, res, next) => {
             res.cookie('authorization', `Bearer ${token}`);
             res.cookie('refreshToken',`Bearer ${refreshToken}`);
     
-            return res.status(200).json({ message: '로그인에 성공하셨습니다.', password, token, email });
+            res.redirect('mainpage');
         }
     });
 

@@ -7,6 +7,9 @@ import { Prisma } from '@prisma/client';
 import "dotenv/config";
 import { uploadProfileImage } from '../middlewares/s3.js'
 
+
+const router = express.Router();
+
 // 프로필 조회 get
 // 1. *이름, 생년월일, *email, 한줄소개, 닉네임
 
@@ -38,7 +41,7 @@ router.get("/profile", authMiddleware, async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ message: "사용자가 존재하지 않습니다."})
     }
-    return res.status(200).json({ data: user });
+    return res.render('profile', { user: user });
   } catch (err) {
     next(err);
   }
