@@ -5,7 +5,7 @@ import authMiddleware from "../middlewares/auth.middleware.js";
 import { prisma } from '../utils/prisma/index.js';
 import { Prisma } from '@prisma/client';
 import "dotenv/config";
-import { upload } from '../middlewares/s3.js'
+import { uploadProfileImage } from '../middlewares/s3.js'
 
 // 프로필 조회 get
 // 1. *이름, 생년월일, *email, 한줄소개, 닉네임
@@ -47,7 +47,7 @@ router.get("/profile", authMiddleware, async (req, res, next) => {
 // 프로필 수정 put
 // 1.  새비밀번호, 새 비밀번호확인 과정 필수
 
-router.put("/profile", authMiddleware, upload, async (req, res, next) => {
+router.put("/profile", authMiddleware, uploadProfileImage, async (req, res, next) => {
   try {
     const { userId } = res.user;
     const { newPwd, checkedPwd } = req.body;
@@ -82,14 +82,14 @@ router.put("/profile", authMiddleware, upload, async (req, res, next) => {
     }
 
     const hashedPwd = await bcrypt.hash(newPwd, 10);
-
+    const imageUrl = req.file.Location;
     await prisma.profile.update({
       where: {
         userProfileId: +userProfileId,
       },
       data: {
         password: hashedPwd,
-        profileimage: req.file.Location, // 이미지 URL 저장
+        profileImage: imageUrl, // 이미지 URL 저장
       },
     });
 

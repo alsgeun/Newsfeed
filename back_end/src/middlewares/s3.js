@@ -16,7 +16,9 @@ const multerUpload = multer({
     dest: tmpdir(),
 }) 
 
-const upload = async (req, res, next) => {
+
+// 프로필 이미지 업로드 함수
+const uploadProfileImage = async (req, res, next) => {
     //업로드 함수를 정의
     return new Promise((resolve, reject) => {
       multerUpload.single("profileImage")(req, res, async (error) => {
@@ -49,4 +51,40 @@ const upload = async (req, res, next) => {
     });
   };
   
-  export { upload };
+// 컨텐츠 이미지 업로드 함수
+const uploadContentImage = async (req, res, next) => {
+  return new Promise((resolve, reject) => {
+    multerUpload.array('contentImage', 3)(req, res, async (error) => {
+      if (error) {
+        return reject(res.status(500).json({ message: error.message }));
+      }
+
+      const uploadPromises = req.files.map(async (file) => {
+        const fileStream = fs.createReadStream(file.path);
+        const uploader = new Upload({
+          client: s3,
+          params: {
+            Bucket: process.env.BUCKET_NAME,
+            Key: file.originalname,
+            Body: fileStream,
+            ContentType: file.mimetype,
+          },
+        });
+
+        try {
+          const result = await uploader.done();
+          file.Location = result.Location;
+        } catch (error) {
+          return reject(res.status(500).json({ message: error.message }));
+        }
+      });
+
+      Promise.all(uploadPromises)
+        .then(() => resolve(next()))
+        .catch((error) => reject(res.status(500).json({ message: error.message })));
+    });
+  });
+};
+
+
+  export { uploadProfileImage,  uploadContentImage };

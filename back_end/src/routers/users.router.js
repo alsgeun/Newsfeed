@@ -6,13 +6,13 @@ import authMiddleware from '../middlewares/auth.middleware.js';
 import { Prisma } from '@prisma/client';
 import dotenv from 'dotenv';
 import { emailVerificationMiddleware }  from '../middlewares/emailtransport.middleware.js'
-import { upload } from '../middlewares/s3.js'
+import { uploadProfileImage } from '../middlewares/s3.js'
 
 dotenv.config();
 const router = express.Router();
 
 
-router.post('/sign-up',upload, async (req, res, next) => {
+router.post('/sign-up',uploadProfileImage, async (req, res, next) => {
     try{
     const { email, password, name,confirmpassword, profileImage, likedmuscle,weight,height,birth,address,nickname,introduction } = req.body; 
     console.log(email);
@@ -34,6 +34,7 @@ router.post('/sign-up',upload, async (req, res, next) => {
         return res.status(409).json({message: '이미 있는 이메일 입니다.'});
     }
     const hashedPassword = await bcrypt.hash(password, 10);
+    const imageUrl = req.file.Location;
     const [user] = await prisma.$transaction(async (tx) => {
         const token = Math.floor(Math.random() * 900000) + 100000;
         const user = await tx.users.create({
@@ -46,7 +47,7 @@ router.post('/sign-up',upload, async (req, res, next) => {
                     emailTokens: token.toString(),
                     profile: {
                         create: {
-                            profileImage: req.file.path,
+                            profileImage: imageUrl,
                             weight: +weight,
                             height: +height,
                             birth: +birth,
@@ -83,7 +84,7 @@ router.put('/user-sign-up/verify', async(req, res, next) => {
             where: { userId: isExistUser.userId },
             data: { verifiedstatus: "pass" },
           });
-            return res.status(201).json({ message: '회원가입이 완료되었습니다.' });
+            res.redirect('sign-in');
     }
     else{
         return res.status(201).json({ message: '다시해라.' });

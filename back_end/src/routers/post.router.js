@@ -2,7 +2,7 @@ import express from 'express'
 import { prisma } from '../utils/prisma/index.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
 import { Prisma } from '@prisma/client';
-import { upload } from '../middlewares/s3.js'
+import { uploadContentImage } from '../middlewares/s3.js'
 
 import dotenv from 'dotenv';
 
@@ -11,30 +11,24 @@ dotenv.config();
 const router = express.Router();
 
 // 게시물 등록
-router.post('/post', authMiddleware, upload ,async (req, res, next) => {
+router.post('/post', authMiddleware, uploadContentImage ,async (req, res, next) => {
     try{
-    const { title, content, contentImage, url, status } = req.body;
+    const { title, content, contentImage } = req.body;
     const { userId } = req.user;
-    if(!status){
-        return res.status(400).json({ message: 'status는 입력해 주셔야 합니다. 식단 게시판인지 운동 루틴 게시판 인지 설정해 주세요.'})
-    }
-    
-    if(status){
         if(!title || !content){
             return res.status(400).json({message: '모든 필드를 입력해주세요'})
         }
+        const imageUrl = req.file.Location;
             const post = await prisma.posts.create({
                 data: {
                     userId: +userId,
                     title: title,
                     content: content,
-                    status: status ,
-                    contentImage: req.file.location,
+                    contentImage: imageUrl,
                 }
             });
 
             return res.status(201).json({ data: post });
-        }
     }catch(err){
         console.error(err);
         next(err);
