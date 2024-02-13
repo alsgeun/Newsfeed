@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입</title>
+  <link rel="stylesheet" type="text/css" href="../styles.css">
+</head>
+<body>
+  <div class="form-wrapper">
+    <h2>회원가입</h2>
+    <form action="/sign-up" method="post">
+      <div class="form-control">
+        <input type="text" id="name" name="name" required />
+        <label for="name">이름</label>
+      </div>
+      <div class="form-control">
+        <input type="text" id="user_id" name="email" required />
+        <label for="user_id">이메일 주소</label>
+      </div>
+      <div class="form-control">
+        <input type="password" id="pw" name="password" required />
+        <label for="pw">비밀번호</label>
+      </div>
+      <div class="form-control">
+        <input type="password" id="confirmpassword" name="confirmpassword" required />
+        <label for="confirmpassword">비밀번호 확인</label>
+      </div>
+      <div class="form-control">
+        <input type="text" id="Genre" name="likedmuscle" required />
+        <label for="Genre">선호하는 부위</label>
+      </div>
+      <div class="form-control">
+        <input type="file" id="profileImage" name="profileImage" required />
+        <label for="profileImage">프로필 이미지</label>
+      </div>
+      <button type="submit">시작하기</button>
+    </form>
+  </div>
+</body>
+</html>
+
+
+

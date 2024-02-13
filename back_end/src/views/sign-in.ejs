@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>오운완</title>
+    <link rel="stylesheet" type="text/css" href="../styles.css" />
+  </head>
+  <body>
+    <div class="form-wrapper">
+      <h2>로그인</h2>
+      <form action="/loginProc" method="POST">
+        <div class="form-control">
+          <input type="text" id="user_id" name="user_id" required />
+          <label for="user_id">이메일 주소</label>
+        </div>
+        <div class="form-control">
+          <input type="password" id="pw" name="pw" required />
+          <label for="pw">비밀번호</label>
+        </div>
+        <button type="submit" id="loginButton">로그인</button>
+        <div class="form-help">
+          <div class="remember-me">
+            <input type="checkbox" id="remember-me" name="remember-me" />
+            <label for="remember-me">로그인 정보 저장</label>
+          </div>
+          <a href="/help">도움이 필요하신가요?</a>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
