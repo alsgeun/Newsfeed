@@ -2,31 +2,14 @@ import express from 'express'
 import { prisma } from '../utils/prisma/index.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
 import { Prisma } from '@prisma/client';
-import aws from 'aws-sdk';
-import multer from 'multer';
-import multerS3 from 'multer-s3';
+
+
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 const router = express.Router();
 
-const s3 = new aws.S3({
-    accessKeyId: process.env.ACCESSKEY_ID,
-    secretAccessKey: process.env.SECRETACCESSKEY,
-    region: 'ap-northeast-2'
-  });
-
-const upload = multer({
-    storage: multerS3({
-      s3,
-      bucket: 'newspeed',
-      acl: 'public-read',
-      key: (req, file, cb) => cb(null, Date.now().toString())
-    })
-  });
-
-  
 // 게시물 등록
 router.post('/post', authMiddleware, upload.single('contentImage'),async (req, res, next) => {
     try{

@@ -9,22 +9,22 @@
 <body>
   <div class="form-wrapper">
     <h2>회원가입</h2>
-    <form action="/sign-up" method="post">
+    <form action="/sign-up" method="post" enctype="multipart/form-data">
       <div class="form-control">
         <input type="text" id="name" name="name" required />
-        <label for="name">이름</label>
+        <label for="name">이름(필수)</label>
       </div>
       <div class="form-control">
         <input type="text" id="user_id" name="email" required />
-        <label for="user_id">이메일 주소</label>
+        <label for="user_id">이메일 주소(필수)</label>
       </div>
       <div class="form-control">
         <input type="password" id="pw" name="password" required />
-        <label for="pw">비밀번호</label>
+        <label for="pw">비밀번호(필수)</label>
       </div>
       <div class="form-control">
         <input type="password" id="confirmpassword" name="confirmpassword" required />
-        <label for="confirmpassword">비밀번호 확인</label>
+        <label for="confirmpassword">비밀번호 확인(필수)</label>
       </div>
       <div class="form-control">
         <input type="text" id="Genre" name="likedmuscle" required />
@@ -32,7 +32,31 @@
       </div>
       <div class="form-control">
         <input type="file" id="profileImage" name="profileImage" required />
-        <label for="profileImage">프로필 이미지</label>
+        <label for="profileImage"></label>
+      </div>
+      <div class="form-control">
+        <input type="number" id="weight" name="weight" required />
+        <label for="weight">몸무게</label>
+      </div>
+      <div class="form-control">
+        <input type="number" id="height" name="height" required />
+        <label for="height">키</label>
+      </div>
+      <div class="form-control">
+        <input type="date" id="birth" name="birth" required />
+        <label for="birth"></label>
+      </div>
+      <div class="form-control">
+        <input type="text" id="address" name="address" required />
+        <label for="address">주소</label>
+      </div>
+      <div class="form-control">
+        <input type="text" id="nickname" name="nickname" required />
+        <label for="nickname">닉네임</label>
+      </div>
+      <div class="form-control">
+        <textarea id="introduction" name="introduction" required></textarea>
+        <label for="introduction">소개</label>
       </div>
       <button type="submit">시작하기</button>
     </form>
