@@ -95,10 +95,10 @@ router.put('/user-sign-up/verify', async(req, res, next) => {
 
 
 
-    router.post('/sign-in', async (req, res, next) => {
-        let user;
-        const {email, password } = req.body;
-        user = await prisma.users.findFirst({
+router.post('/sign-in', async (req, res, next) => {
+    let user;
+    const {email, password } = req.body;
+    user = await prisma.users.findFirst({
             where: {
                 email,
             }
@@ -111,7 +111,8 @@ router.put('/user-sign-up/verify', async(req, res, next) => {
         }
         
         if (!(await bcrypt.compare(password, user.password))) {
-            return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.'});
+            req.flash('error', '비밀번호가 일치하지 않습니다. 남은 기회는 5번입니다.');
+            return res.redirect('/sign-in');
         } else {
             // JWT 생성하기
             const token = jwt.sign({ userId: user.userId }, process.env.JWT_SECRET, { expiresIn: '12h' });

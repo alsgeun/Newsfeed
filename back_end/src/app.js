@@ -2,6 +2,8 @@
 import express from 'express';
 import PostsRouter from './routers/post.router.js';
 import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import flash from 'connect-flash';
 import "dotenv/config";
 import usersRouter from './routers/users.router.js';
 import path from "path";
@@ -15,13 +17,23 @@ app.use(express.urlencoded({ extended: true }));
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// 세션
+app.use(session({
+  secret: process.env.SESSION_SECRET_KEY,
+  resave: false,
+  saveUninitialized: true,
+}));
+
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
-app.use(methodOverride('_method'));
+app.use(methodOverride('_method')); // ejs에서 get이랑 put 되게 하는거
+app.use(flash()); // 플래시 경고창 띠우는거
+
 
 app.get('/sign-in', (req, res) => {
-  res.render('sign-in'); // Render login.ejs
+  const errorMessage = req.flash('error');
+  res.render('sign-in', { message: errorMessage });
 });
 
 app.get('/sign-up', (req, res) => {
