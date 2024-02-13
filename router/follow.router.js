@@ -66,7 +66,7 @@ router.delete('/:userId', authMiddleware, async(req, res, next) =>{
     return res.status(400).json({ message : "언팔로우 하려는 아이디를 입력 하세요."})
 
     // 팔로우 중이 맞는지 확인
-    const followUser = await prisma.users.findMany({
+    const followUser = await prisma.follows.findMany({
         where : {
             followingId : +followUserId,    // users 테이블(DB)의 팔로우중인 아이디중에서(followingId) 언팔하려는 사람의 아이디가 있는가
             followerId : +myUserId          // 또 DB에 있는 팔로워 아이디(followerId) 중 로그인한 사용자의 아이디(myUserId)가 있는가
@@ -88,11 +88,12 @@ router.delete('/:userId', authMiddleware, async(req, res, next) =>{
 // 팔로우 목록 조회
 router.get('/following', authMiddleware, async (req, res, next) => {
   const myUserId = req.user.userId
+  //console.log(req.user.userId)
   const followingUsers = await prisma.users.findMany({
     where : {
       follower : {
         some : {
-          followingId : +myUserId,
+          followingId : +myUserId
         }
       }
     },
@@ -101,6 +102,7 @@ router.get('/following', authMiddleware, async (req, res, next) => {
       email : true
     }
   })
+  //console.log(followingUsers)
   return res.status(201).json({ followingUsers })
 })
 
