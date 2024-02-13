@@ -1,0 +1,40 @@
+<h1>게시물 등록</h1>
+<form action="/post" method="POST" enctype="multipart/form-data">
+  <div>
+    <label for="title">운동 부위:</label>
+    <input type="text" id="title" name="title" required>
+  </div>
+  <div>
+    <label for="content">메인 운동 종목:</label>
+    <textarea id="content" name="content" required></textarea>
+  </div>
+  <div>
+    <label for="contentImage">오운완 인증하세요:</label>
+    <input type="file" id="contentImage" name="contentImage">
+  </div>
+  <button type="submit">게시물 등록</button>
+</form>
+
+<h1>게시물 목록</h1>
+<div id="post-list"></div>
+
+<script>
+  // 페이지 로딩 시 게시물 목록을 가져옵니다.
+  window.onload = function() {
+    fetch('/post')
+      .then(response => response.json())
+      .then(data => {
+        const postList = document.getElementById('post-list');
+        data.data.forEach(post => {
+          const postElement = document.createElement('div');
+          postElement.innerHTML = `
+            <h2>${post.title}</h2>
+            <p>${post.content}</p>
+            <img src="${post.contentImage}" alt="게시물 이미지">
+            <a href="/post/${post.postId}">자세히 보기</a>
+          `;
+          postList.appendChild(postElement);
+        });
+      });
+  };
+</script>
