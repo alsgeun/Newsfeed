@@ -30,31 +30,34 @@ model Profile {
     name          String   @map("name")
     weight        Int?     @map("weight")
     height        Int?     @map("height")
-    birth         Int?     @map("birth")
+    birth         String   @map("birth")
     address       String?  @map("address")
-    nickname      String?  @map("nickname")
+    nickname      String   @map("nickname")
     introduction  String?  @map("introduction")
     profileImage  String?  @map("profileImage")
     createdAt     DateTime @default(now()) @map("createdAt")
     updatedAt     DateTime @updatedAt @map("updatedAt")
-    user          Users    @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+    user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
     @@map("Profile")
 }
 
 model Posts {
-    postId       Int         @id @default(autoincrement())
-    userId       Int         @map("userId")
-    title        String      @map("title")
-    content      String      @map("content")
-    contentImage String      @map("contentImage") @db.Text
-    url          String?     @map("url")
-    status       Status      @map("status")
-    createdAt    DateTime    @default(now()) @map("createdAt")
-    updatedAt    DateTime    @updatedAt @map("updateAt")
-    user         Users       @relation(fields: [userId], references: [userId], onDelete: Cascade)
-    comment      Comments[]
-    favorite     Favorites[]
+    postId       Int      @id @default(autoincrement())
+    userId       Int      @map("userId")
+    title        String   @map("title")
+    content      String   @map("content")
+    contentImage String   @map("contentImage") @db.Text
+    url          String?  @map("url")
+    status       Status   @map("status")
+    // favor_cnt    Int      @map("favor_cnt")
+    createdAt    DateTime @default(now()) @map("createdAt")
+    updatedAt    DateTime @updatedAt @map("updateAt")
+
+    user     Users       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    comment  Comments[]
+    favorite Favorites[]
 
     @@map("Posts")
 }
@@ -66,25 +69,34 @@ model Comments {
     content_cmm String   @map("content_cmm") @db.Text
     createdAt   DateTime @default(now()) @map("createdAt")
     updatedAt   DateTime @updatedAt @map("updatedAt")
-    post        Posts    @relation(fields: [postId], references: [postId], onDelete: Cascade)
-    user        Users    @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+    post Posts @relation(fields: [postId], references: [postId], onDelete: Cascade)
+    user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    // favorite Favorites[]
 
     @@map("Comments")
 }
 
 model Friends {
-    userId   Int   @map("userId")
-    friendId Int   @unique @default(autoincrement()) @map("postId")
-    user     Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    userId   Int @map("userId")
+    friendId Int @unique @default(autoincrement()) @map("postId")
+
+    user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
     @@map("Friends")
 }
 
 model Favorites {
-    userId Int   @unique @map("userId")
-    postId Int   @map("postId")
-    user   Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
-    post   Posts @relation(fields: [postId], references: [postId], onDelete: Cascade)
+    userId     Int      @unique @map("userId")
+    postId     Int      @map("postId")
+    // commentId Int @map("commentId")
+    favoriteId Int      @id @default(autoincrement()) @map("favoriteId")
+    createdAt  DateTime @default(now()) @map("createdAt")
+    updatedAt  DateTime @updatedAt @map("updatedAt")
+
+    user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    post Posts @relation(fields: [postId], references: [postId], onDelete: Cascade)
+    // comment Comments @relation(fields: [commentId], references: [commentId], onDelete: Cascade)
 
     @@map("Favorites")
 }
