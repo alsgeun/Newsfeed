@@ -5,6 +5,7 @@ import { S3Client } from '@aws-sdk/client-s3'
 import "dotenv/config";
 import fs from "fs";
 import { tmpdir } from "os";
+import { Upload } from "@aws-sdk/lib-storage";
 
 const s3 = new S3Client({
   accessKeyId: process.env.ACCESSKEY_ID,
@@ -18,7 +19,7 @@ const multerUpload = multer({
 const upload = async (req, res, next) => {
     //업로드 함수를 정의
     return new Promise((resolve, reject) => {
-      multerUpload.single("profileimage")(req, res, async (error) => {
+      multerUpload.single("profileImage")(req, res, async (error) => {
         // 멀터.싱글을 요청해서 파일을 가져오고
         if (error) {
           reject(res.status(500).json({ message: error.message }));
@@ -26,7 +27,7 @@ const upload = async (req, res, next) => {
         console.log(req.file);
         const fileStream = fs.createReadStream(req.file.path); //파일을 읽는 스트림 생성
 
-        const uploader = new upload({
+        const uploader = new Upload({
           // 파일을 S3에 업로드
           client: s3,
           params: {

@@ -2,7 +2,7 @@ import express from 'express'
 import { prisma } from '../utils/prisma/index.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
 import { Prisma } from '@prisma/client';
-
+import { upload } from '../middlewares/s3.js'
 
 import dotenv from 'dotenv';
 
@@ -11,7 +11,7 @@ dotenv.config();
 const router = express.Router();
 
 // 게시물 등록
-router.post('/post', authMiddleware, upload.single('contentImage'),async (req, res, next) => {
+router.post('/post', authMiddleware, upload ,async (req, res, next) => {
     try{
     const { title, content, contentImage, url, status } = req.body;
     const { userId } = req.user;

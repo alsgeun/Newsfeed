@@ -4,7 +4,6 @@ import bcrypt from "bcrypt";
 import authMiddleware from "../middlewares/auth.middleware.js";
 import { prisma } from '../utils/prisma/index.js';
 import { Prisma } from '@prisma/client';
-import { S3Client } from '@aws-sdk/client-s3'
 import "dotenv/config";
 import { upload } from '../middlewares/s3.js'
 

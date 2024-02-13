@@ -44,12 +44,12 @@ router.post('/sign-up',upload, async (req, res, next) => {
                     likedmuscle,
                     verifiedstatus: "nonpass", // 상태를 '가입대기중'으로 설정
                     emailTokens: token.toString(),
-                    Profile: {
+                    profile: {
                         create: {
                             profileImage: req.file.path,
-                            weight,
-                            height,
-                            birth,
+                            weight: +weight,
+                            height: +height,
+                            birth: +birth,
                             address,
                             nickname,
                             introduction,
@@ -63,7 +63,7 @@ router.post('/sign-up',upload, async (req, res, next) => {
         },{
             isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted
         })
-        return res.status(201).json({ email, name });
+        res.redirect('sign-up-verify');
 }catch(err){
     next(err);
 }

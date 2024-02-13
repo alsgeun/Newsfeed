@@ -7,15 +7,27 @@ import "dotenv/config";
 import usersRouter from './routers/users.router.js';
 import path from "path";
 import { fileURLToPath } from "url";
+import methodOverride from "method-override";
+
 const app = express();
+
+
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
+app.use(methodOverride('_method'));
+
+
+
+
+
 
 app.get('/sign-in', (req, res) => {
   res.render('sign-in'); // Render login.ejs
@@ -24,6 +36,12 @@ app.get('/sign-in', (req, res) => {
 app.get('/sign-up', (req, res) => {
   res.render('sign-up'); // Render signup.ejs
 });
+
+
+app.get('/sign-up-verify', (req, res) => {
+  res.render('sign-up-verify'); // Render signup.ejs
+});
+
 app.use('/', [PostsRouter, usersRouter]);
 
 const PORT = 3098;
