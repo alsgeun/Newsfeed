@@ -107,12 +107,28 @@ router.post('/sign-in', async (req, res, next) => {
         console.log(user);
         
         if(!user){
-            return res.status(401).json({message: '존재하지 않는 이메일입니다.'});
+            req.flash('error', '이메일이 존재하지 않습니다.');
+            return res.redirect('sign-in');
         }
         
         if (!(await bcrypt.compare(password, user.password))) {
-            req.flash('error', '비밀번호가 일치하지 않습니다. 남은 기회는 5번입니다.');
-            return res.redirect('/sign-in');
+            user.failedAttempts = user.failedAttempts ? user.failedAttempts + 1 : 1;
+
+            await prisma.users.update({
+                where: {
+                    email: email,
+                },
+                data: {
+                    failedAttempts: user.failedAttempts,
+                },
+            });
+
+            if(user.failedAttempts >= 5) {
+                req.flash('error', '비밀번호를 5번 이상 틀렸습니다. 회원가입 페이지로 돌아갑니다.');
+                return res.redirect('sign-up');
+            }
+            req.flash('error', `비밀번호가 일치하지 않습니다. 남은 기회는 ${5 - user.failedAttempts}번입니다.`);
+            return res.redirect('sign-in');
         } else {
             // JWT 생성하기
             const token = jwt.sign({ userId: user.userId }, process.env.JWT_SECRET, { expiresIn: '12h' });
