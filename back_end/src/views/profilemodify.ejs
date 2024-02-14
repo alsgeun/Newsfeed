@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>오운완</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/styles.css" />
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="form-wrapper">
+      <h2>프로필 수정</h2>
+      <form method="POST" action="/profile-modify?_method=PUT" enctype="multipart/form-data">
+
+        <div class="form-control">
+          <label for="currentPwd">현재 비밀번호:</label>
+          <input type="password" id="currentPwd" name="currentPwd" required>
+        </div>
+        <div class="form-control">
+          <label for="newPwd">새로운 비밀번호:</label>
+          <input type="password" id="newPwd" name="newPwd" required>
+        </div>
+        <div class="form-control">
+          <label for="checkedPwd">새로운 비밀번호 확인:</label>
+          <input type="password" id="checkedPwd" name="checkedPwd" required>
+        </div>
+        <div class="form-control">
+          <label for="weight"></label>
+          <input type="text" id="weight" name="weight" placeholder="몸무게">
+        </div>
+        <div class="form-control">
+          <label for="height"></label>
+          <input type="text" id="height" name="height" placeholder="키">
+        </div>
+        <div class="form-control">
+          <label for="birth"></label>
+          <input type="date" id="birth" name="birth" placeholder="생년월일">
+        </div>
+        <div class="form-control">
+          <label for="address"></label>
+          <input type="text" id="address" name="address" placeholder="주소">
+        </div>
+        <div class="form-control">
+          <label for="nickname"></label>
+          <input type="text" id="nickname" name="nickname" placeholder="닉네임">
+        </div>
+        <div class="form-control">
+          <label for="introduction"></label>
+          <textarea id="introduction" name="introduction" placeholder="자기소개"></textarea>
+        </div>
+        <div class="form-control">
+            <input type="file" id="profileImage" name="profileImage" required />
+            <label for="profileImage"></label>
+          </div>
+        <button type="submit">프로필 수정</button>
+      </form>
+    </div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="myModalLabel">알림</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <%= message %>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">확인</button>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+  
+      <% if (message.length > 0) { %>
+        <script>
+          $(document).ready(function() {
+            $('#myModal').modal('show');
+      
+            // 모달창이 닫히는 이벤트를 감지
+            $('#myModal').on('hidden.bs.modal', function () {
+              // 페이지 이동
+              window.location.href = '/profilemodify';
+            });
+          });
+        </script>
+      <% } %>
+      </body>
+    </html>

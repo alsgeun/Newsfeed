@@ -51,8 +51,9 @@ app.get('/sign-withdrawal', (req, res) => {
   res.render('sign-withdrawal', { message });
 });
 
-app.get('/profile', (req, res) => {
-  res.render('profile'); // Render signup.ejs
+app.get('/profilemodify', (req, res) => {
+  const message = req.flash('message');
+  res.render('profilemodify', { message });
 });
 
 app.get('/mainpage', (req, res) => {

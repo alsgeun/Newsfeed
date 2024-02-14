@@ -1,3 +1,12 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Page</title>
+  <link rel="stylesheet" type="text/css" href="/mainstyles.css"> <!-- CSS 파일 참조 -->
+</head>
+<body>
 <div id="profile">
     <a href="/profile">
       <img id="profile-image" alt="내 프로필">
@@ -31,12 +40,16 @@
   window.onload = function() {
     // 프로필 정보를 가져옵니다.
     fetch('/profile')
-      .then(response => response.json())
-      .then(data => {
-        const profileData = data.data;
-        document.getElementById('profile-nickname').innerText = profileData.profile.nickname;
-        document.getElementById('profile-image').src = profileData.profile.profileImage;
-      });
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('profile-image').src = data.user.profile.profileImage;
+        document.getElementById('profile-nickname').innerText = data.user.profile.nickname;
+    });
+
+    // 프로필 이미지에 클릭 이벤트 리스너를 추가합니다.
+    document.getElementById('profile-image').addEventListener('click', () => {
+      location.href = '/profile';
+    });
       // 게시물 가져옴
       fetch('/post')
     .then(response => response.json())
@@ -60,3 +73,5 @@
 
   };
 </script>
+</body>
+</html>

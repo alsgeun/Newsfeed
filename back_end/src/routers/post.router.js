@@ -31,7 +31,7 @@ router.post('/post', authMiddleware, uploadContentImage ,async (req, res, next) 
                 }
             });
 
-            return res.status(201).json({ data: post });
+            res.redirect('mainpage');
     }catch(err){
         console.error(err);
         next(err);
