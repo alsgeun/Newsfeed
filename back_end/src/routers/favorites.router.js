@@ -25,7 +25,7 @@ router.post("/posts/:postId/favorites", authMiddleware, async (req, res) => {
     });
     if (!existingLike) {
       return res.status(400).json({
-        errorMessage: "이미 좋아요 했습니다. 좋아요는 1번만 가능해요 ㅠㅠ!!",
+        errorMessage: "게시물이 존재하지 않습니다. 확인해주세요!!",
       });
     }
 
@@ -82,7 +82,7 @@ router.post(
         }),
         prisma.comments.update({
           where: { commentId: +commentId },
-          data: { fav_cnt: { increment: 1 } },
+          data: { click: { increment: 1 } },
         }),
       ]);
       return res
