@@ -232,18 +232,35 @@ router.patch('/users', authMiddleware,async (req, res, next) => {
 })
 
 // 회원 탈퇴
-router.delete('/profile', authMiddleware, async (req, res, next) => {
+router.delete('/withdrawal', authMiddleware, async (req, res, next) => {
     const { userId } = req.user;
     const { checkedPwd } = req.body;
-    
-    const isExistUser = await prisma.users.findFirst({
-        where: { email : email }
+    const user = await prisma.users.findFirst({
+        where: { userId: userId }
     })
 
-    if(isExistUser.password !== checkedPwd){
-        req.flash('message', '비밀번호가 틀립니다. 다시 시도해 주세요.');
+    const isValidPwd = await bcrypt.compare(checkedPwd, user.password);
+    if (!isValidPwd){
+        req.flash('message', '비밀번호가 틀렸습니다.');
+        return res.redirect('/sign-withdrawal');
     }
     else{
+
+        await prisma.posts.deleteMany({
+            where: { userId: +userId }
+        });
+        await prisma.comments.deleteMany({
+            where: { userId: +userId }
+        });
+        await prisma.favorites.deleteMany({
+            where: { userId: +userId }
+        });
+        await prisma.follows.deleteMany({
+            where: { followingId: +userId }
+        });
+        await prisma.follows.deleteMany({
+            where: { followerId: +userId }
+        });
         await prisma.users.delete({
             where: { userId: +userId }
         })
