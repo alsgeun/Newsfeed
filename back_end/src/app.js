@@ -60,6 +60,15 @@ app.get('/mainpage', (req, res) => {
   res.render('mainpage'); // Render signup.ejs
 });
 
+app.get('/onepostpage', (req, res) => {
+  res.render('onepostpage'); // Render onepostpage.ejs
+});
+
+app.get('/postedit', (req, res) => {
+  const message = req.flash('message');
+  res.render('postedit', { message }); // Render onepostpage.ejs
+});
+
 app.use('/', [PostsRouter, usersRouter, ProfileRouter]);
 
 const PORT = 3098;

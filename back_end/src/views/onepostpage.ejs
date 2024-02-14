@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>One Post Page</title>
+  <link rel="stylesheet" type="text/css" href="/mainstyles.css">
+  <style>
+    .card {
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+      transition: 0.3s;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 10px;
+    }
+    .card:hover {
+      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h1><%= post.title %></h1>
+  <p><%= post.content %></p>
+  <div id="post-images">
+    <% post.contentImages.forEach((image) => { %>
+      <img src="<%= image.imageUrl %>" alt="게시물 이미지">
+    <% }) %>
+  </div>
+</div>
+
+<button id="edit-button">게시물 수정</button>
+<button id="delete-button">게시물 삭제</button>
+
+<script>
+  const postId = location.pathname.split('/')[2]; // URL에서 게시물 ID를 가져옴
+
+  // 게시물 수정 버튼 클릭 시 게시물 수정 페이지로 이동
+  document.getElementById('edit-button').addEventListener('click', () => {
+    location.href = `/post/${postId}/edit`;
+  });
+
+  // 게시물 삭제 버튼 클릭 시 게시물 삭제 후 메인 페이지로 이동
+  document.getElementById('delete-button').addEventListener('click', () => {
+    fetch(`/post/${postId}`, {
+      method: 'DELETE'
+    }).then(() => {
+      alert('게시물이 삭제되었습니다.');
+      location.href = '/';
+    });
+  });
+</script>
+
+</body>
+</html>

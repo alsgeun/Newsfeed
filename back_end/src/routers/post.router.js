@@ -69,10 +69,32 @@ router.get('/post', async (req, res, next) => {
     next(error);
 }
 });
+// 특정 게시물 수정 페이지 get만 받을 수 이성서 만들어야됨
+router.get('/post/:postId/edit', authMiddleware, async (req, res, next) => {
+    try {
+        const postId = req.params.postId;
+
+        const post = await prisma.posts.findFirst({
+            where: { postId: +postId },
+        });
+
+        if (!post) {
+            return res.status(404).send('해당 게시물을 찾을 수 없습니다.');
+        }
+        const message = req.flash('message');
+        res.render('postedit', { post, message });
+    } catch (err) {
+        next(err);
+    }
+});
+
+
+
+
 
 
 // 특정 게시물 조회
-router.get('/post/:postId', async(req, res, next) =>{
+router.get('/post/:postId', async (req, res, next) => {
     const { postId } = req.params;
 
     const post = await prisma.posts.findFirst({
@@ -99,34 +121,46 @@ router.get('/post/:postId', async(req, res, next) =>{
                 }
             }
         }
-    })
+    });
 
-    return res.status(200).json({ data: post });
+    // 페이지 렌더링
+    res.render('onepostpage', { post });
 });
 
 
 // 특정 게시물 수정
-router.put('/post/:postId', authMiddleware, async (req, res, next) => {
+router.put('/post/:postId/edit', authMiddleware, uploadContentImage, async (req, res, next) => {
     try {
         const postId = req.params.postId;
-        const { title, content, url, status } = req.body;
+        const { title, content } = req.body;
+
+        // 필수 항목 체크
+        if (!title || !content) {
+            req.flash('message', '필수 입력칸을 전부 입력해주세요.');
+            return res.redirect('/post/' + postId + '/edit');
+        }
+
         const updatedData = {
             title,
             content,
-            url,
-            status,
-            contentImage: req.file.location,
         };
 
-        const post = await prisma.posts.update({
+        if (req.file) { // 사용자가 이미지를 업로드했을 경우
+            updatedData.contentImage = req.file.location;
+        }
+
+        await prisma.posts.update({
             data: updatedData,
             where: { postId: +postId },
         });
-        return res.status(200).json({message: "게시물 변경에 성공했습니다.", post})
-    }catch(err) {
+
+        req.flash('message', '게시물이 수정되었습니다!');
+        res.redirect('/post/' + postId);
+    } catch(err) {
         next(err)
     }
-})
+});
+
 
 // 특정 게시물 삭제
 router.delete('/post/:postId', authMiddleware, async (req, res, next) => {
