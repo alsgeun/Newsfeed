@@ -72,22 +72,28 @@ router.post('/sign-up',uploadProfileImage, async (req, res, next) => {
 
 router.put('/user-sign-up/verify', async(req, res, next) => {
     try{
-    const { email,verifiedusertoken } = req.body; 
+    const { email, verifiedusertoken } = req.body; 
     console.log("이메일 인증 토큰임");
 
     const isExistUser = await prisma.users.findFirst({
         where: { email : email }
     })
     
+    if(!isExistUser.emailTokens){
+        req.flash('error', '정상적으로 메일이 가지 않았습니다. 메일을 확인해주세요.');
+        res.redirect('sign-up-verify');
+    }
     if(verifiedusertoken === isExistUser.emailTokens){
         await prisma.users.update({
             where: { userId: isExistUser.userId },
             data: { verifiedstatus: "pass" },
           });
-            res.redirect('sign-in');
+        req.flash('error', '이메일 인증에 성공하였습니다.');
+        res.redirect('/sign-in');
     }
     else{
-        return res.status(201).json({ message: '다시해라.' });
+        req.flash('message', '인증번호가 다릅니다.');
+        res.redirect('/sign-up-verify');
     }
     }catch(err) {
         next(err);
@@ -228,24 +234,23 @@ router.patch('/users', authMiddleware,async (req, res, next) => {
 // 회원 탈퇴
 router.delete('/profile', authMiddleware, async (req, res, next) => {
     const { userId } = req.user;
-    const { newPwd, checkedPwd } = req.body;
-  
-    if (!newPwd || !checkedPwd) {
-      return res
-        .status(400)
-        .json({ errorMessage: "필수사항을 모두 작성해주세요!!" });
-    }
+    const { checkedPwd } = req.body;
     
-    if(!userId){
-        return res.status(404).json({ mesage: "프로필이 없습니다." });
-    }
-  
-    await prisma.users.delete({
-        where: { userId: +userId }
+    const isExistUser = await prisma.users.findFirst({
+        where: { email : email }
     })
-  
-  
-    return res.status(200).json({ message: "회원탈퇴되었습니다. "});
-  })
+
+    if(isExistUser.password !== checkedPwd){
+        req.flash('message', '비밀번호가 틀립니다. 다시 시도해 주세요.');
+    }
+    else{
+        await prisma.users.delete({
+            where: { userId: +userId }
+        })
+      
+        req.flash('message', '회원탈퇴되었습니다, 로그인 페이지로 이동합니다.');
+        res.redirect('/sign-up');
+    }
+})
 
 export default router;

@@ -1,6 +1,6 @@
 <div id="profile">
     <a href="/profile">
-      <img id="profile-image" alt="프로필 사진">
+      <img id="profile-image" alt="내 프로필">
     </a>
     <span id="profile-nickname"></span>
   </div>
@@ -39,23 +39,24 @@
       });
       // 게시물 가져옴
       fetch('/post')
-      .then(response => response.json())
-      .then(data => {
+    .then(response => response.json())
+    .then(data => {
         const postList = document.getElementById('post-list');
         data.data.forEach(post => {
-          const postElement = document.createElement('div');
-          postElement.style.border = '1px solid #ccc'; /* 테두리 추가 */
-          postElement.style.borderRadius = '10px'; /* 둥근 모서리 추가 */
-          postElement.style.margin = '10px'; /* 간격 추가 */
-          postElement.style.padding = '10px'; /* 내부 여백 추가 */
-          postElement.innerHTML = `
-            <h2>${post.title}</h2>
-            <p>${post.content}</p>
-            <img src="${post.contentImage}" alt="게시물 이미지">
-            <a href="/post/${post.postId}">자세히 보기</a>
-          `;
-          postList.appendChild(postElement);
+            const postElement = document.createElement('div');
+            postElement.style.border = '1px solid #ccc'; /* 테두리 추가 */
+            postElement.style.borderRadius = '10px'; /* 둥근 모서리 추가 */
+            postElement.style.margin = '10px'; /* 간격 추가 */
+            postElement.style.padding = '10px'; /* 내부 여백 추가 */
+            postElement.innerHTML = `
+                <h2>${post.title}</h2>
+                <p>${post.content}</p>
+                ${post.contentImages.map(image => `<img src="${image.imageUrl}" alt="게시물 이미지">`).join('')}
+                <a href="/post/${post.postId}">자세히 보기</a>
+            `;
+            postList.appendChild(postElement);
         });
-      });
+    });
+
   };
 </script>

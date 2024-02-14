@@ -42,7 +42,13 @@ app.get('/sign-up', (req, res) => {
 
 
 app.get('/sign-up-verify', (req, res) => {
-  res.render('sign-up-verify'); // Render signup.ejs
+  const message = req.flash('message');
+  res.render('sign-up-verify', { message });
+});
+
+app.get('/sign-withdrawal', (req, res) => {
+  const message = req.flash('message');
+  res.render('sign-withdrawal', { message });
 });
 
 app.get('/profile', (req, res) => {

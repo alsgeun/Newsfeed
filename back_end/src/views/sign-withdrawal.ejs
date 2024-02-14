@@ -3,31 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>이메일 인증</title>
+  <title>회원 탈퇴</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="/styles.css" />
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
 <body>
-  <div class="form-wrapper">
-    <h2>이메일 인증</h2>
-    <form action="/user-sign-up/verify?_method=PUT" method="post">
-      <div class="form-control">
-        <input type="text" id="email" name="email" required />
-        <label for="email">이메일 주소(필수)</label>
-      </div>
-      <div class="form-control">
-        <input type="text" id="verifiedusertoken" name="verifiedusertoken" required />
-        <label for="verifiedusertoken">인증번호(필수)</label>
-      </div>
-      <div class="form-control">
-        <input type="checkbox" id="terms" name="terms" required />
-        <label for="terms">이용약관에 동의합니다(필수)</label>
-      </div>
-      <button type="submit">인증하기</button>
-    </form>
-  </div>
+  <h2>회원 탈퇴</h2>
+  <form action="/profile" method="POST">
+    <input type="hidden" name="_method" value="DELETE">
+    <label for="checkedPwd">비밀번호 확인</label>
+    <input type="password" id="checkedPwd" name="checkedPwd" required />
+    <button type="submit">회원 탈퇴</button>
+  </form>
   <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">

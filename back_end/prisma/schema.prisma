@@ -17,7 +17,7 @@ model Users {
   updatedAt DateTime @updatedAt @map("updatedAt")
   emailTokens String @map("emailTokens")
   likedmuscle String @map("likedmuscle")
-  failedAttempts Int @map("failedAttempts")
+  failedAttempts Int? @map("failedAttempts")
   verifiedstatus User_Status  @map("verifiedstatus")
   profile  Profile?
   post     Posts[]
@@ -48,14 +48,13 @@ model Posts {
   userId       Int      @map("userId")
   title        String   @map("title")
   content      String   @map("content")
-  contentImage String?  @map("contentImage") @db.Text
   url          String?  @map("url")
-  status       Status   @map("status")
   createdAt    DateTime @default(now()) @map("createdAt")
   updatedAt    DateTime @updatedAt @map("updateAt")
   user     Users      @relation(fields: [userId], references: [userId], onDelete: Cascade)
   comment  Comments[]
   favorite Favorites[]
+  contentImages ContentImages[]
   @@map("Posts")
 }
 model Comments {
@@ -91,10 +90,13 @@ model Follows {
   @@map("Follows")
 }
 
-enum Status {
-  healthfood
-  healthmathod
+model ContentImages {
+  imageId  Int    @id @default(autoincrement())
+  postId   Int
+  imageUrl String
+  post     Posts  @relation(fields: [postId], references: [postId])
 }
+
 
 enum User_Status {
   pass

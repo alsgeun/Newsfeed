@@ -13,18 +13,21 @@ const router = express.Router();
 // 게시물 등록
 router.post('/post', authMiddleware, uploadContentImage ,async (req, res, next) => {
     try{
-    const { title, content, contentImage } = req.body;
+    const { title, content } = req.body;
     const { userId } = req.user;
         if(!title || !content){
             return res.status(400).json({message: '모든 필드를 입력해주세요'})
         }
-        const imageUrl = req.file.Location;
+        const imageUrls = req.files.map(file => file.Location);
             const post = await prisma.posts.create({
                 data: {
                     userId: +userId,
                     title: title,
                     content: content,
-                    contentImage: imageUrl,
+                    contentImages: {
+                        create: imageUrls.map(imageUrl => ({ imageUrl })),
+                        // 각 이미지 URL로 새 이미지를 생성
+                    },
                 }
             });
 
@@ -52,7 +55,11 @@ router.get('/post', async (req, res, next) => {
                 content: true,
                 createdAt: true,
                 updatedAt: true,
-                status: true,
+                contentImages: {
+                    select: {
+                        imageUrl: true,
+                    }
+                }
             },
             orderBy: orderByCondition,
     });
@@ -76,7 +83,11 @@ router.get('/post/:postId', async(req, res, next) =>{
             content: true,
             createdAt: true,
             updatedAt: true,
-            contentImage: true,
+            contentImages: {
+                select: {
+                    imageUrl: true,
+                }
+            },
             user: {
                 select: {
                     userId: true,
@@ -90,7 +101,7 @@ router.get('/post/:postId', async(req, res, next) =>{
         }
     })
 
-    return res.status(200).json({ data: resume });
+    return res.status(200).json({ data: post });
 });
 
 
