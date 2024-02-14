@@ -1,10 +1,10 @@
 import express from "express";
-import { prisma } from "../../../prisma/index.js";
+import { prisma } from "../prisma/index.js";
 // import UsersRouter from "./routes/users.router.js";
 // import PostsRouter from "./routes/.posts.router.js";
 // import CommentsRouter from "./routes/.comments.router.js";
 
-import authMiddleware from "../../../middlewares/auth.middleware.js";
+import authMiddleware from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -44,54 +44,61 @@ const router = express.Router();
 
 //------------------------------------------------------
 
-router.get("/favorites", authMiddleware, async (req, res) => {
-  const { userId } = res.locals.user;
+router.get("/favorites/:postId", authMiddleware, async (req, res) => {
+  try {
+    const { postId } = req.params;
+    if (!postId) {
+      return res
+        .status(400)
+        .json({ errorMessage: "게시물 Id는 필수 값 입니다. 확인해주세요!!" });
+    }
+    // const cnt = await prisma.favorites.findFirst({
+    //   where: { favoriteId },
+    // });
 
-  const orderKey = req.query.orderKey ?? "postId";
-  const orderValue = req.query.orderValue ?? "desc";
-
-  // const cnt = await prisma.favorites.findFirst({
-  //   where: { favoriteId },
-  // });
-
-  const show = await prisma.posts.findFirst({
-    where: { userId: userId },
-    select: {
-      userId: true,
-      postId: true,
-      title: true,
-      content: true,
-      contentImage: true,
-      url: true,
-      status: true,
-      favorites: {
-        select: {
-          fav_cnt: true,
-        },
+    const show = await prisma.posts.findFirst({
+      where: { postId: +postId },
+      select: {
+        postId: true,
+        title: true,
+        content: true,
+        contentImage: true,
+        fav_cnt: true,
+        url: true,
+        status: true,
         createdAt: true,
         updatedAt: true,
       },
-    },
-    orderBy: [
-      {
-        [orderKey]: orderValue.toLowerCase(),
-      },
-    ],
-  });
-
-  return res.status(200).json({ data: show });
+      orderBy: [
+        {
+          fav_cnt: "desc",
+        },
+      ],
+    });
+    if (!show) {
+      return res.json({ data: {} });
+    }
+    return res.status(200).json({ data: show });
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.put("/favorites", authMiddleware, async (req, res) => {
-  // const userId = res.locals.user.userId;
-  const { userId, postId } = req.body;
-  const existsFav = await prisma.favorites.findUnique({
-    where: { userId, postId: postId },
+router.put("/favorites/:postId", authMiddleware, async (req, res) => {
+  const userId = res.locals.user.userId;
+  const { postId } = req.params;
+  const { title, content } = req.body;
+
+  if (!postId || !title || !content) {
+    return res.status(400).json({ errorMessage: "필수사항을 확인해주세요!!" });
+  }
+  const existsFav = await prisma.posts.findFirst({
+    where: { userId, postId: +postId },
   });
 
   try {
     if (!existsFav) {
-      await prisma.favorites.update({
+      await prisma.favorites.create({
         userId: userId,
         postId: postId,
       });
@@ -100,7 +107,7 @@ router.put("/favorites", authMiddleware, async (req, res) => {
       return res.status(200).send("좋아요 ♥");
     } else {
       favorites.destroy({
-        where: { postId: postId },
+        where: { postId: +postId },
       });
 
       await prisma.posts.decrement({ fav_cnt: 1 }, { where: { postId } });
