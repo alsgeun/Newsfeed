@@ -7,6 +7,7 @@ import { Prisma } from '@prisma/client';
 import dotenv from 'dotenv';
 import { emailVerificationMiddleware }  from '../middlewares/emailtransport.middleware.js'
 import { uploadProfileImage } from '../middlewares/s3.js'
+import axios from 'axios';
 
 dotenv.config();
 const router = express.Router();
@@ -270,4 +271,140 @@ router.delete('/withdrawal', authMiddleware, async (req, res, next) => {
     }
 })
 
+
+
+// 구글 로그인 
+// 루트 페이지
+// 로그인 버튼을 누르면 GET /login으로 이동
+router.get('/', (req, res) => {
+    res.send();
+});
+
+// 로그인 버튼을 누르면 도착하는 목적지 라우터
+// 모든 로직을 처리한 뒤 구글 인증 서버인 https://accounts.google.com/o/oauth2/v2/auth
+// 으로 redirect 되는데, 이 url에 첨부할 몇가지 QueryString들이 필요
+router.get('/google/login', (req, res) => {
+    let url = 'https://accounts.google.com/o/oauth2/v2/auth';
+    // client_id는 위 스크린샷을 보면 발급 받았음을 알 수 있음
+    // 단, 스크린샷에 있는 ID가 아닌 당신이 직접 발급 받은 ID를 사용해야 함.
+    url += `?client_id=${process.env.GOOGLE_CLIENT_ID}`
+    // 아까 등록한 redirect_uri
+    // 로그인 창에서 계정을 선택하면 구글 서버가 이 redirect_uri로 redirect 시켜줌
+    url += `&redirect_uri=${process.env.GOOGLE_REDIRECT_URI}`
+    // 필수 옵션.
+    url += '&response_type=code'
+    // 구글에 등록된 유저 정보 email, profile을 가져오겠다 명시
+    url += '&scope=email profile'
+    // 완성된 url로 이동
+    // 이 url이 위에서 본 구글 계정을 선택하는 화면임.
+    res.redirect(url);
+});
+
+// 구글 계정 선택 화면에서 계정 선택 후 redirect 된 주소
+// 아까 등록한 GOOGLE_REDIRECT_URI와 일치해야 함
+// 우리가 http://localhost:3000/login/redirect를
+// 구글에 redirect_uri로 등록했고,
+// 위 url을 만들 때도 redirect_uri로 등록했기 때문
+router.get('/redirect', (req, res) => {
+    const { code } = req.query;
+    console.log(`code: ${code}`);
+    res.send('ok');
+});
+// http://localhost:3098/google/redirect?code=4%2F0AeaYSHA2Hr286q5Idsy-ns2QyvargowoILdlKiXL2TUNjQeMd3yzIGGK9EqeE1TiZBPxDQ&scope=email+profile+openid+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&authuser=0&prompt=consent
+// 토큰을 요청하기 위한 구글 인증 서버 url
+const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
+const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
+router.get('/google/redirect', async (req, res) => {
+    const { code } = req.query;
+    console.log(`code: ${code}`);
+
+    // access_token, refresh_token 등의 구글 토큰 정보 가져오기
+    const resp = await axios.post(GOOGLE_TOKEN_URL, {
+        // x-www-form-urlencoded(body)
+        code,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+        grant_type: 'authorization_code',
+    });
+
+    console.log(resp)
+    const resp2 = await axios.get(GOOGLE_USERINFO_URL, {
+        headers: {
+            Authorization: `Bearer ${resp.data.access_token}`,
+        },
+    });
+    res.json(resp2.data);
+    res.redirect('/mainpage');
+});
+
+
+// 카카오 로그인 
+router.get("/oauth", (req, res) => {
+    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.KAKAO_APIKEY}&redirect_uri=${process.env.KAKAO_URL}&response_type=code`;
+    res.redirect(kakaoAuthUrl);
+  });
+
+
+  router.get("/oauth/callback", async (req, res) => {
+    const code = req.query.code;
+    const tokenRequest = await axios({
+      method: "POST",
+      url: "https://kauth.kakao.com/oauth/token",
+      headers: {
+        "content-type": "application/x-www-form-urlencoded",
+      },
+      data: {
+        grant_type: "authorization_code",
+        client_id: process.env.KAKAO_APIKEY,
+        redirect_uri: process.env.KAKAO_URL,
+        code,
+      },
+    });
+    const { access_token } = tokenRequest.data;
+    // 카카오 서버에서 액세스 토큰을 반환합니다.
+    const profileRequest = await axios({
+      method: "GET",
+      url: "https://kapi.kakao.com/v2/user/me",
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });// axios를 이용하여 카카오 서버에 토큰 요청을 보냅니다.
+  
+    const { email, profile } = profileRequest.data.kakao_account;
+    const name = profile.nickname;
+    const user = await prisma.users.findFirst({ where: { email } });
+  //카카오 서버에서 프로필에 있는 이메일과 이름을 추출합니다.
+  
+    const users = await prisma.users.upsert({
+      where: { email },
+      update: { email, name },
+      create: { 
+        email, 
+        name, 
+        password: "default",
+        // Checkpass: "default",
+        verifiedstatus: "pass",
+    },
+    }); 
+    //이후 사용자 정보를 저장합니다.
+  
+    const userJWT = jwt.sign({ userId: users.id }, process.env.JWT_SECRET, { expiresIn: "12h" }
+    );
+
+
+    res.cookie("authorization", `Bearer ${userJWT}`);
+    res.status(200).json({ message: '로그인 완료되었습니다.' });
+   return res.redirect("/mainpage");
+  }); //axios를 이용하여 예제1을 기준으로 작성하여 카카오 서버에 토큰 요청을 보냅니다.
+
+router.get('/oauth/logout', async(req,res) => {
+    const logout_Url = `https://kauth.kakao.com/oauth/logout?client_id=${process.env.KAKAO_APIKEY}&logout_redirect_uri=${process.env.KAKAO_LOGOUT}`;
+    res.redirect(logout_Url);
+})
+
+router.get('/oauth/logout/callback', (req, res) => {
+    res.clearCookie('token');
+    res.status(200).json({ message: '로그아웃에 성공하였습니다.' });
+});
 export default router;

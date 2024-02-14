@@ -15,8 +15,8 @@ model Users {
   password  String   @map("password")
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
-  emailTokens String @map("emailTokens")
-  likedmuscle String @map("likedmuscle")
+  emailTokens String? @map("emailTokens")
+  likedmuscle String? @map("likedmuscle")
   failedAttempts Int? @map("failedAttempts")
   verifiedstatus User_Status  @map("verifiedstatus")
   profile  Profile?

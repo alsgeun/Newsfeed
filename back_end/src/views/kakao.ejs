@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>오운완</title>
+  <link rel="stylesheet" type="text/css" href="../public/styles.css" />
+</head>
+
+<body>
+  <div class="form-wrapper">
+    <h2>로그인</h2>
+    <form action="/log-in" method="POST">
+      <div class="form-control">
+        <input type="text" id="user_id" name="email" required />
+        <label for="user_id">이메일 주소</label>
+      </div>
+      <div class="form-control">
+        <input type="password" id="pw" name="password" required />
+        <label for="pw">비밀번호</label>
+      </div>
+      <button type="submit" id="loginButton">로그인</button>
+      <div class="button-list">
+        <a style="display: flex;
+                flex-direction: column-reverse;" id="kakao-login-btn" href="javascript:loginWithKakao()">
+          <img
+            src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Ft1.daumcdn.net%2Fcfile%2Ftistory%2F996E15375C3D83CA20"
+            width="100%" height="39px" alt="카카오 로그인 버튼" />
+        </a>
+      </div>
+      <div>
+        <a style="display: flex;
+                flex-direction: column-reverse;" id="google-login-btn" href="/google/login">
+          <img
+            src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Ft1.daumcdn.net%2Fcfile%2Ftistory%2F99C1FC375C3D83C921"
+            width="100%" height="39px" alt="구글 로그인 버튼" />
+        </a>
+      </div>
+      <div class="form-help">
+
+        <div class="help-link">
+          <a href="/help">도움이 필요하신가요?</a>
+        </div>
+      </div>
+    </form>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+
+</body>
+
+</html>
