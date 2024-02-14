@@ -2,18 +2,19 @@
 
 import express from "express";
 //import cookieParser from "cookie-parser";
-// import UsersRouter from "../routes/users.router.js";
-import FavoritesRouter from "./back_end/src/routers/favorites.router.js";
+import UsersRouter from "./routes/users.router.js";
+import PostsRouter from "./routes/resumes.router.js";
+import FavoritesRouter from "./routes/favorites.router.js";
 //import LogMiddleware from "./middlewaresumesres/log.middleware.js";
 import ErrorHandlingMiddleware from "./middlewares/error-handling.middleware.js";
 
 const app = express();
-const PORT = 3098;
+const PORT = 3058;
 
 //app.use(LogMiddleware);
 app.use(express.json());
 //app.use(cookieParser());
-app.use("/api", [FavoritesRouter]);
+app.use("/api", [UsersRouter, PostsRouter, FavoritesRouter]);
 app.use(ErrorHandlingMiddleware);
 
 app.get("/", (req, res) => {
