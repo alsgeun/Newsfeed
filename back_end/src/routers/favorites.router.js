@@ -145,7 +145,7 @@ router.put("/posts/:postId/favorites", authMiddleware, async (req, res) => {
     } else {
       return res.status(400).json({ errorMessage: "좋아요가 없습니다!" });
     }
-    return res.status(201).json({ message: "좋아요 취소 (ㅠOㅠ)" });
+    return res.status(200).json({ message: "좋아요 취소 (ㅠOㅠ)" });
   } catch (error) {
     next(err);
   }
@@ -187,7 +187,7 @@ router.put(
       } else {
         return res.status(400).json({ errorMessage: "좋아요가 없습니다!" });
       }
-      return res.status(201).json({ message: "좋아요 취소 (ㅠOㅠ)" });
+      return res.status(200).json({ message: "좋아요 취소 (ㅠOㅠ)" });
     } catch (error) {
       next(err);
     }
