@@ -51,9 +51,10 @@ model Posts {
     contentImage String   @map("contentImage") @db.Text
     url          String?  @map("url")
     status       Status   @map("status")
-    // favor_cnt    Int      @map("favor_cnt")
-    createdAt    DateTime @default(now()) @map("createdAt")
-    updatedAt    DateTime @updatedAt @map("updateAt")
+    fav_cnt      Boolean? @map("fav_cnt")
+
+    createdAt DateTime @default(now()) @map("createdAt")
+    updatedAt DateTime @updatedAt @map("updateAt")
 
     user     Users       @relation(fields: [userId], references: [userId], onDelete: Cascade)
     comment  Comments[]
@@ -87,12 +88,11 @@ model Friends {
 }
 
 model Favorites {
-    userId     Int      @unique @map("userId")
-    postId     Int      @map("postId")
+    userId    Int      @unique @map("userId")
+    postId    Int      @map("postId")
     // commentId Int @map("commentId")
-    favoriteId Int      @id @default(autoincrement()) @map("favoriteId")
-    createdAt  DateTime @default(now()) @map("createdAt")
-    updatedAt  DateTime @updatedAt @map("updatedAt")
+    createdAt DateTime @default(now()) @map("createdAt")
+    updatedAt DateTime @updatedAt @map("updatedAt")
 
     user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
     post Posts @relation(fields: [postId], references: [postId], onDelete: Cascade)
