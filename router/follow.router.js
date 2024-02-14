@@ -10,12 +10,11 @@ router.post("/:userId", authMiddleware, async (req, res, next) => {
   const myUserId = req.user.userId; // 인증이 완료된 본인 아이디
 
   // 에러 메세지 출력
-  if (!followUserId)
-    // 오타라던지, 여러 이유로 잘못 됐을때
+  if (!followUserId)  // 오타라던지, 여러 이유로 잘못 됐을때
     return res
       .status(400)
       .json({ message: "팔로우 하려는 사람의 아이디가 없습니다." });
-  if (myUserId == followUserId)
+  if (myUserId == followUserId) // 자신의 아아디와 팔로우 하려는 사람의 아이디를 똑같이 적었을때
     return res
       .status(400)
       .json({ message: "자신의 아이디는 입력 하면 안됩니다." });
@@ -91,9 +90,9 @@ router.get('/following', authMiddleware, async (req, res, next) => {
   //console.log(req.user.userId)
   const followingUsers = await prisma.users.findMany({
     where : {
-      follower : {
-        some : {
-          followingId : +myUserId
+      following : {
+        some : {        
+          followerId : +myUserId    
         }
       }
     },
@@ -108,12 +107,12 @@ router.get('/following', authMiddleware, async (req, res, next) => {
 
 // 팔로워 목록 조회
 router.get('/follower', authMiddleware, async(req, res, next) => {
-  const followUserId = req.user.userId
+  const myUserId = req.user.userId
   const followers = await prisma.users.findMany({
     where : { 
-      following : {
-        some : {
-          followerId : +followUserId
+      follower : {
+        some : {        
+          followingId : +myUserId     
         }
       }
     },
