@@ -169,7 +169,7 @@ router.put(
       if (!existingFav) {
         return res
           .status(400)
-          .json({ errorMessage: "게시물이 존재하지 않습니다. 확인해주세요!!" });
+          .json({ errorMessage: "댓글이 존재하지 않습니다. 확인해주세요!!" });
       }
 
       const favoritesComments = await prisma.favorites.findFirst({
