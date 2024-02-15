@@ -62,23 +62,15 @@ model Comments {
   commentId   Int      @id @default(autoincrement()) @map("commentId")
   userId      Int      @map("userId")
   postId      Int      @map("postId")
-  content_cmm String   @map("content_cmm") @db.Text
+  content_cmm String   @map("content_cmm")
   createdAt   DateTime @default(now()) @map("createdAt")
   updatedAt   DateTime @updatedAt @map("updatedAt")
-  clike Int @default(0)
+  click Int @default(0)
   post Posts @relation(fields: [postId], references: [postId], onDelete: Cascade)
   user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
   favorites Favorites[]
   @@map("Comments")
 }
-
-// model Favorites {
-//   userId Int @unique @map("userId")
-//   postId Int @map("postId")
-//   user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
-//   post Posts @relation(fields: [postId], references: [postId], onDelete: Cascade)
-//   @@map("Favorites")
-// }
 
 model Favorites {
     favoriteId Int @id @default(autoincrement()) @map("favoriteId")
@@ -110,7 +102,7 @@ model ContentImages {
   imageId  Int    @id @default(autoincrement())
   postId   Int
   imageUrl String
-  post     Posts  @relation(fields: [postId], references: [postId])
+  post     Posts  @relation(fields: [postId], references: [postId], onDelete: Cascade)
 }
 
 

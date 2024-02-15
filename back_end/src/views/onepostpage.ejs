@@ -32,6 +32,8 @@
 
 <button id="edit-button">게시물 수정</button>
 <button id="delete-button">게시물 삭제</button>
+<button id="like-button">좋아요</button>
+<button id="comments-button">댓글로 가기</button>
 
 <script>
   const postId = location.pathname.split('/')[2]; // URL에서 게시물 ID를 가져옴
@@ -41,13 +43,30 @@
     location.href = `/post/${postId}/edit`;
   });
 
+  document.getElementById('comments-button').addEventListener('click', () => {
+    location.href = `/post/${postId}/comments`;
+  });
+
   // 게시물 삭제 버튼 클릭 시 게시물 삭제 후 메인 페이지로 이동
   document.getElementById('delete-button').addEventListener('click', () => {
     fetch(`/post/${postId}`, {
       method: 'DELETE'
     }).then(() => {
       alert('게시물이 삭제되었습니다.');
-      location.href = '/';
+      location.href = '/mainpage';
+    });
+  });
+
+  // 좋아요 버튼 클릭 시 게시물에 좋아요
+  document.getElementById('like-button').addEventListener('click', () => {
+    fetch(`/posts/${postId}/favorites`, {
+      method: 'POST'
+    })
+    .then(response => response.json())
+    .then(response => {
+      if (response.message) {
+        alert(response.message);
+      }
     });
   });
 </script>
