@@ -36,12 +36,20 @@ router.post("/posts/:postId/favorites", authMiddleware, async (req, res) => {
   }
 
   if (!favoritesPosts) {
+    //transaction
     await prisma.favorites.create({
       data: {
         postId: +postId,
         userId: +userId,
       },
     });
+
+    await prisma.favorites.delete({
+      where: {
+        favoriteId: favoritesPosts.favoriteId,
+      },
+    });
+
     await prisma.posts.update({
       where: { postId: +postId },
       data: { fav_cnt: { increment: 1 } },
