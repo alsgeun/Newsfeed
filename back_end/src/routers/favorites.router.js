@@ -17,47 +17,49 @@ const router = express.Router();
 router.post("/posts/:postId/favorites", authMiddleware, async (req, res) => {
   const { postId } = req.params;
   const { userId } = res.locals.user;
-  try {
-    const existingFav = await prisma.posts.findFirst({
-      where: {
-        postId: +postId,
-      },
+  const existingFav = await prisma.posts.findFirst({
+    where: {
+      postId: +postId,
+    },
+  });
+  const favoritesPosts = await prisma.favorites.findFirst({
+    where: {
+      postId: +postId,
+      userId: +userId,
+    },
+  });
+
+  if (!existingFav) {
+    return res.status(400).json({
+      errorMessage: "게시물이 존재하지 않습니다. 확인해주세요!!",
     });
-    const favoritesPosts = await prisma.favorites.findFirst({
-      where: {
+  }
+
+  if (!favoritesPosts) {
+    //transaction
+    await prisma.favorites.create({
+      data: {
         postId: +postId,
         userId: +userId,
       },
     });
 
-    if (!existingFav) {
-      return res.status(400).json({
-        errorMessage: "게시물이 존재하지 않습니다. 확인해주세요!!",
-      });
-    }
-
-    if (!favoritesPosts) {
-      await prisma.favorites.create({
-        data: {
-          postId: +postId,
-          userId: +userId,
-        },
-      });
-      await prisma.posts.update({
-        where: { postId: +postId },
-        data: { fav_cnt: { increment: 1 } },
-      });
-    } else {
-      return res.status(400).json({
-        errorMessage: "이미 좋아요 했습니다. 좋아요는 1번만 가능해요 ㅠㅠ!!",
-      });
-    }
-    return res.status(200).json({
-      message: "게시물 좋아요 성공 (^O^)",
+    await prisma.favorites.delete({
+      where: {
+        favoriteId: favoritesPosts.favoriteId,
+      },
     });
-  } catch (err) {
-    next(err);
+
+    await prisma.posts.update({
+      where: { postId: +postId },
+      data: { fav_cnt: { increment: 1 } },
+    });
+  } else {
+    return res.status(400).json({
+      errorMessage: "이미 좋아요 했습니다. 좋아요는 1번만 가능해요 ㅠㅠ!!",
+    });
   }
+  return res.status(200).json({ message: "게시물 좋아요 성공 (^O^)" });
 });
 
 // 댓글 좋아요
@@ -188,7 +190,7 @@ router.put(
         return res.status(400).json({ errorMessage: "좋아요가 없습니다!" });
       }
       return res.status(200).json({ message: "좋아요 취소 (ㅠOㅠ)" });
-    } catch (error) {
+    } catch (err) {
       next(err);
     }
   }
