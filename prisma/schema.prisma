@@ -1,3 +1,5 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 generator client {
     provider = "prisma-client-js"
 }
@@ -8,18 +10,22 @@ datasource db {
 }
 
 model Users {
-    userId    Int      @id @default(autoincrement()) @map("userId")
-    email     String   @unique @map("email")
-    password  String   @map("password")
-    createdAt DateTime @default(now()) @map("createdAt")
-    updatedAt DateTime @updatedAt @map("updatedAt")
-    client_id String?  @map("client_id")
-
-    profile  Profile?
-    post     Posts[]
-    comment  Comments[]
-    friend   Friends[]
-    favorite Favorites[]
+    userId         Int          @id @default(autoincrement()) @map("userId")
+    email          String       @unique @map("email")
+    name           String       @map("name")
+    password       String       @map("password")
+    createdAt      DateTime     @default(now()) @map("createdAt")
+    updatedAt      DateTime     @updatedAt @map("updatedAt")
+    emailTokens    String?      @map("emailTokens")
+    likedmuscle    String?      @map("likedmuscle")
+    failedAttempts Int?         @map("failedAttempts")
+    verifiedstatus User_Status? @map("verifiedstatus")
+    profile        Profile?
+    post           Posts[]
+    comment        Comments[]
+    favorite       Favorites[]
+    following      Follows[]    @relation("following")
+    follower       Follows[]    @relation("follower")
 
     @@map("Users")
 }
@@ -27,81 +33,88 @@ model Users {
 model Profile {
     userProfileId Int      @id @default(autoincrement()) @map("userProfileId")
     userId        Int      @unique @map("userId")
-    name          String   @map("name")
     weight        Int?     @map("weight")
     height        Int?     @map("height")
-    birth         String   @map("birth")
+    birth         Int?     @map("birth")
     address       String?  @map("address")
-    nickname      String   @map("nickname")
+    nickname      String?  @unique @map("nickname")
     introduction  String?  @map("introduction")
     profileImage  String?  @map("profileImage")
     createdAt     DateTime @default(now()) @map("createdAt")
     updatedAt     DateTime @updatedAt @map("updatedAt")
-
-    user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    user          Users    @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
     @@map("Profile")
 }
 
 model Posts {
-    postId       Int      @id @default(autoincrement())
-    userId       Int      @map("userId")
-    title        String   @map("title")
-    content      String   @map("content")
-    contentImage String   @map("contentImage") @db.Text
-    url          String?  @map("url")
-    status       Status   @map("status")
-    fav_cnt      Boolean? @map("fav_cnt")
-
-    createdAt DateTime @default(now()) @map("createdAt")
-    updatedAt DateTime @updatedAt @map("updateAt")
-
-    user     Users       @relation(fields: [userId], references: [userId], onDelete: Cascade)
-    comment  Comments[]
-    favorite Favorites[]
+    postId    Int         @id @default(autoincrement())
+    userId    Int         @map("userId")
+    title     String      @map("title")
+    content   String      @map("content")
+    url       String?     @map("url")
+    createdAt DateTime    @default(now()) @map("createdAt")
+    updatedAt DateTime    @updatedAt @map("updateAt")
+    fav_cnt   Int         @default(0) @map("fav_cnt")
+    user      Users       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    comment   Comments[]
+    favorite  Favorites[]
+    // contentImages ContentImages[]
 
     @@map("Posts")
 }
 
 model Comments {
-    commentId   Int      @id @default(autoincrement()) @map("commentId")
-    userId      Int      @map("userId")
-    postId      Int      @map("postId")
-    content_cmm String   @map("content_cmm") @db.Text
-    createdAt   DateTime @default(now()) @map("createdAt")
-    updatedAt   DateTime @updatedAt @map("updatedAt")
-
-    post Posts @relation(fields: [postId], references: [postId], onDelete: Cascade)
-    user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
-    // favorite Favorites[]
+    commentId   Int         @id @default(autoincrement()) @map("commentId")
+    userId      Int         @map("userId")
+    postId      Int         @map("postId")
+    content_cmm String      @map("content_cmm") @db.Text
+    createdAt   DateTime    @default(now()) @map("createdAt")
+    updatedAt   DateTime    @updatedAt @map("updatedAt")
+    click       Int         @default(0) @map("click")
+    post        Posts       @relation(fields: [postId], references: [postId], onDelete: Cascade)
+    user        Users       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    favorites   Favorites[]
 
     @@map("Comments")
 }
 
-model Friends {
-    userId   Int @map("userId")
-    friendId Int @unique @default(autoincrement()) @map("postId")
-
-    user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
-
-    @@map("Friends")
-}
-
 model Favorites {
-    userId    Int      @unique @map("userId")
-    postId    Int      @map("postId")
-    // commentId Int @map("commentId")
-    createdAt DateTime @default(now()) @map("createdAt")
-    updatedAt DateTime @updatedAt @map("updatedAt")
-
-    user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
-    post Posts @relation(fields: [postId], references: [postId], onDelete: Cascade)
-    // comment Comments @relation(fields: [commentId], references: [commentId], onDelete: Cascade)
+    favoriteId Int       @id @default(autoincrement()) @map("favoriteId")
+    userId     Int
+    postId     Int?
+    commentId  Int?
+    createdAt  DateTime  @default(now()) @map("createdAt")
+    updatedAt  DateTime  @updatedAt @map("updatedAt")
+    user       Users     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    post       Posts?    @relation(fields: [postId], references: [postId], onDelete: Cascade)
+    comment    Comments? @relation(fields: [commentId], references: [commentId], onDelete: Cascade)
 
     @@map("Favorites")
 }
 
-enum Status {
-    healthfood
-    healthmathod
+model Follows {
+    followingId    Int      @map("followingId") // (내가) 팔로잉 하는 사람
+    followerId     Int      @map("followerId") //(나를) 팔로잉 하는 사람
+    createdAt      DateTime @default(now()) @map("createdAt")
+    updatedAt      DateTime @updatedAt @map("updatedAt")
+    followingCount Int      @default(0) @map("followingCount")
+    followerCount  Int      @default(0) @map("followerCount")
+    following      Users    @relation("following", fields: [followingId], references: [userId])
+    follower       Users    @relation("follower", fields: [followerId], references: [userId])
+
+    @@id([followingId, followerId])
+    @@map("Follows")
+}
+
+// model ContentImages {
+//     imageId  Int    @id @default(autoincrement())
+//     postId   Int
+//     imageUrl String
+//     post     Posts  @relation(fields: [postId], references: [postId])
+// }
+
+enum User_Status {
+    pass
+    nonpass
 }
