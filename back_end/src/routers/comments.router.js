@@ -7,7 +7,7 @@ const router = express.Router();
 // 댓글 작성
 router.post('/post/:postId/comments', authMiddleware, async (req, res, next) => {
     const { postId } = req.params;
-    const { content } = req.body;
+    const { content_cmm } = req.body;
     const { userId } = req.user;
 
     const post = await prisma.posts.findFirst({
@@ -17,12 +17,15 @@ router.post('/post/:postId/comments', authMiddleware, async (req, res, next) => 
         });
     if(!post) 
         return res.status(404).json({message: '게시글이 존재하지 않습니다.'})
+    
+    if(!content_cmm) 
+     return res.status(400).json({message: '댓글 내용이 누락되었습니다.'})
 
     const comment = await prisma.comments.create({
         data: {
             postId: +postId,
             userId: +userId,
-            content: content
+            content_cmm: content_cmm,
         }
     })
 
@@ -30,13 +33,14 @@ router.post('/post/:postId/comments', authMiddleware, async (req, res, next) => 
     return res.status(201).json({message: "댓글이 생성되었습니다."});
 });
 
+
 // 댓글 조회 
-router.get('/posts/:postId/comments', async (req, res, next) => {
+router.get('/post/:postId/comments', async (req, res, next) => {
     const { postId } = req.params;
 
     const post = await prisma.posts.findFirst({
         where: { 
-            postId: +postId, 
+            postId: +postId,
         },
         });
     if(!post) 
@@ -56,15 +60,15 @@ router.get('/posts/:postId/comments', async (req, res, next) => {
             }
         }
     });
-
-    return res.status(200).json({data: comments});
+    
+    return res.render('comments', { post, comments });
 })
 
 
 
 
 // 댓글 수정
-router.put('/post/:postId/comment/:commentId', authMiddleware, async (req, res, next) => {
+router.put('/post/:postId/comments/:commentId', authMiddleware, async (req, res, next) => {
     try {
         const { userId } = req.user;
         const { content } = req.body;

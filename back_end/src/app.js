@@ -10,10 +10,13 @@ import path from "path";
 import { fileURLToPath } from "url";
 import methodOverride from "method-override";
 import ProfileRouter from './routers/profile.router.js'
+import commentsRouter from './routers/comments.router.js'
+import bodyParser from 'body-parser';
+import favorite from './routers/favorite.js'
 const app = express();
 
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -23,6 +26,7 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
 }));
+
 
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
@@ -69,7 +73,11 @@ app.get('/postedit', (req, res) => {
   res.render('postedit', { message }); // Render onepostpage.ejs
 });
 
-app.use('/', [PostsRouter, usersRouter, ProfileRouter]);
+app.get('/comments', (req, res) => {
+  res.render('comments'); // Render onepostpage.ejs
+});
+
+app.use('/', [PostsRouter, usersRouter, ProfileRouter, commentsRouter,favorite]);
 
 const PORT = 3098;
 app.listen(PORT, () => {
